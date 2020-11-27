@@ -1,2 +1,3 @@
 *.pyc
 firmware/output
+.idea/*
