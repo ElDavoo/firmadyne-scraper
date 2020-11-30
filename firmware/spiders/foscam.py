@@ -36,11 +36,13 @@ class FoscamSpider(Spider):
                 # print(prods)
                 # skip the table header
                 for p in [x for x in prods[1:]]:
-                    print('ey')
-                    print(p.xpath('td[6]//a/@href').extract())
+                    version = p.xpath('td[1]//text()').extract_first()
+                    # skip partial versions
+                    if '_p' in version:
+                        continue
                     item = FirmwareLoader(item=FirmwareImage(), response=response)
-                    item.add_value("version", p.xpath('td[1]//text()').extract())
-                    item.add_value("url", 'https://foscam.com' + p.xpath('td[6]//a/@href').extract_first())
+                    item.add_value("version", version)
+                    item.add_value("url", 'https://www.foscam.com' + p.xpath('td[6]//a/@href').extract_first())
                     item.add_value("product", product)
                     item.add_value("vendor", self.name)
                     yield item.load_item()
