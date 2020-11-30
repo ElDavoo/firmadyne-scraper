@@ -32,10 +32,12 @@ class PolycomSpider(Spider):
                     continue
 
                 # remove unnecessary files
-                if any(x in url.lower() for x in ["end user license agreement", "eula", "release notes",
+                to_remove_list = ["end user license agreement", "eula", "release notes",
                                                    "mac os", "windows", "guide", "(pdf)", "sample", "client",
                                                    "manager", "software", "virtual", "control_panel",
-                                                   "activexbypass"]) \
+                                                   "activexbypass"]
+                if any(x in url.lower() for x in to_remove_list) \
+                        or any(x in version.lower() for x in to_remove_list) \
                         or any(url.endswith(x) for x in ["htm", "html", "pdf", "ova", ".plcm.vc"]):
                     continue
 
