@@ -60,7 +60,7 @@ class FirmwarePipeline(FilesPipeline):
         # check for filtered url types in path
         url = urllib.parse.urlparse(item["url"])
         # a special exception for the foscam html URL
-        if 'foscam.com' in url.netloc:
+        if 'foscam.com' in str(url.netloc):
             pass
         elif any(url.path.endswith(x) for x in [".pdf", ".php", ".txt", ".doc", ".rtf", ".docx", ".htm", ".html", ".md5", ".sha1", ".torrent"]):
             raise DropItem("Filtered path extension: %s" % url.path)

@@ -20,7 +20,6 @@ class FoscamSpider(Spider):
     def parse(self, response):
         # bit ugly but it works :-)
         if "pid" not in response.meta:
-            print("doei")
             for pid in range(0, 1000):
                 yield Request(
                     url=urllib.parse.urljoin(response.url, "firmware_details.html?id=%s" % pid),
@@ -30,8 +29,6 @@ class FoscamSpider(Spider):
                     callback=self.parse)
         else:
             for product in response.xpath("//div[@class='download_list_icon']/span/text()").extract():
-                print(product)
-
                 prods = response.xpath("//table[@class='down_table']//tr")
                 # print(prods)
                 # skip the table header
