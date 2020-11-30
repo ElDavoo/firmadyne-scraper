@@ -1,3 +1,7 @@
+Additions from fork
+===========
+This repo some fixed spiders and other bugfixes. The only included spiders are confirmed to be working correctly.
+
 Introduction
 ============
 
