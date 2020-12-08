@@ -78,6 +78,7 @@ class FirmwarePipeline(FilesPipeline):
     def item_completed(self, results, item, info):
         item[self.files_result_field] = []
         if isinstance(item, dict) or self.files_result_field in item.fields:
+            print([x for ok, x in results if not ok])
             item[self.files_result_field] = [x for ok, x in results if ok]
 
         if self.database:
