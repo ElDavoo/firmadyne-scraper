@@ -62,7 +62,7 @@ class SynologySpider(Spider):
                     basename.remove(software)
                     product = " ".join(basename)
                 else:
-                    # usually "sonology_x86_ds13_1504
+                    # usually "synology_x86_ds13_1504
                     product = basename[-2]
 
                 item = FirmwareLoader(
