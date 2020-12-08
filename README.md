@@ -1,6 +1,6 @@
 Additions from fork
 ===========
-This repo has fixed some spiders and other bugfixes related to compatibility with python3. The only included spiders are confirmed to be working correctly in 2020.
+This repo has fixed some spiders and other bugfixes related to compatibility with python3. The included spiders are confirmed to be working correctly in 2020.
 
 Introduction
 ============
