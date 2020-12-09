@@ -47,7 +47,7 @@ class NetgearSpider(Spider):
             name = entry.xpath("./a[@class='accordion-title']/h1/text()").extract_first()
             url = entry.xpath("./div[@class='accordion-content']//a/@href").extract_first()
 
-            if '#confirm-download-' in url:
+            if '#confirm-download-' in url or 'http://kb.netgear.com/' in url:
                 continue
 
             if 'Firmware' in name and not 'Upgrade' in name:
