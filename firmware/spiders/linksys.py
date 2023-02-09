@@ -1,6 +1,6 @@
 from scrapy import Spider
 from scrapy.http import Request, HtmlResponse
-
+ 
 from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
@@ -13,8 +13,7 @@ import urllib.request, urllib.parse, urllib.error
 class LinksysSpider(Spider):
     name = "linksys"
     allowed_domains = ["linksys.com"]
-    start_urls = ["http://www.linksys.com/us/support/sitemap/"]
-
+    start_urls = ["http://www.linksys.com/sitemap/"]
     def parse(self, response):
         for link in response.xpath("//div[@class='item']//a/@href").extract():
             yield Request(

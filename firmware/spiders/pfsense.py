@@ -11,7 +11,7 @@ import urllib.request, urllib.parse, urllib.error
 class PfSenseSpider(Spider):
     name = "pfsense"
     allowed_domains = ["pfsense.org"]
-    start_urls = ["http://files.pfsense.org/mirror/downloads/"]
+    start_urls = ["https://atxfiles.pfsense.org/mirror/downloads/"]
 
     def parse(self, response):
         for link in response.xpath("//a"):

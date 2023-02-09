@@ -14,7 +14,7 @@ class HuaweiZHSpider(Spider):
     vendor = "huawei"
     region = "cn"
     allowed_domains = ["huawei.com"]
-    start_urls = ["http://consumer.huawei.com/en/support/downloads/index.htm"]
+    start_urls = ["http://support.huawei.com/enterprise/cn/software/index.html"]
 
     def parse(self, response):
         yield Request(

@@ -11,8 +11,8 @@ import urllib.request, urllib.parse, urllib.error
 class SynologySpider(Spider):
     name = "synology"
     allowed_domains = ["synology.com"]
-    start_urls = ["http://dedl.synology.com/download/DSM/beta/",
-                  "http://dedl.synology.com/download/DSM/release/", "http://dedl.synology.com/download/VSFirmware/"]
+    start_urls = ["http://synology.com/download/DSM/beta/",
+                  "http://synology.com/download/DSM/release/", "http://synology.com/download/VSFirmware/"]
 
     def parse(self, response):
         for entry in response.xpath("//table/tr[position() > 3]"):

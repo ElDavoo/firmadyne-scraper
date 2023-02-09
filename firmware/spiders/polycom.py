@@ -10,8 +10,8 @@ import urllib.request, urllib.parse, urllib.error
 class PolycomSpider(Spider):
     name = "polycom"
     allowed_domains = ["polycom.com"]
-    start_urls = ["http://support.polycom.com/PolycomService/support/us/support/video/index.html", "http://support.polycom.com/PolycomService/support/us/support/voice/index.html", "http://support.polycom.com/PolycomService/support/us/support/network/index.html",
-                  "http://support.polycom.com/PolycomService/support/us/support/cloud_hosted_solutions/index.html", "http://support.polycom.com/PolycomService/support/us/support/strategic_partner_solutions/index.html"]
+    start_urls = ["https://poly.com/us/en/support/products/video-conferencing/accessories/index.html", "https://poly.com/us/en/support/products/network/index.html",
+                  "https://poly.com/us/en/support/products/cloud-hosted-solutions/index.html", "https://poly.com/us/en/support/products/strategic-partner-solutions/index.html"]
 
     download = "/PolycomService/support/us"
 

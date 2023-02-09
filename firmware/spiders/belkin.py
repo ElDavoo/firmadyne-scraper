@@ -12,9 +12,9 @@ class BelkinSpider(Spider):
     allowed_domains = ["belkin.com", "belkin.force.com"]
     start_urls = ["http://www.belkin.com/us/support"]
 
-    def parse(self, response):
+    def parse(self, response): 
         if not response.xpath(
-                "//form[@id='productSearchForm']//input[@name='category']/@value").extract()[0]:
+                "//form[@id='productSearchForm']//input[@name='category']/@value").extract():
             for category in response.xpath("//form[@id='productSearchForm']/div[1]//ul[@class='select-options']//a/@data-id").extract():
                 yield FormRequest.from_response(response,
                                                 formname="productSearchForm",

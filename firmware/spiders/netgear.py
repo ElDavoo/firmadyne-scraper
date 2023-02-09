@@ -5,14 +5,21 @@ from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
 import urllib.request, urllib.parse, urllib.error
-
+from urllib.request import urlopen
+import json
 
 class NetgearSpider(Spider):
     name = "netgear"
     allowed_domains = ["netgear.com"]
+    
     # "http://downloadcenter.netgear.com/fr/", "http://downloadcenter.netgear.com/de/", "http://downloadcenter.netgear.com/it/", "http://downloadcenter.netgear.com/ru/", "http://downloadcenter.netgear.com/other/"]
+    
     start_urls = ["http://downloadcenter.netgear.com"]
-
+    links_json=json.loads(urlopen('https://www.netgear.com/system/supportModels.json').read());
+    for lnk in links_json:
+        print('http://netgear.com/support/download/?model='+lnk['model'])
+        start_urls.append('http://netgear.com/support/download/?model='+lnk['model'])
+    
     visited = []
 
     # grab the first argument from e.g.

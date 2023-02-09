@@ -14,7 +14,7 @@ class HuaweiENSpider(Spider):
     vendor = "huawei"
     region = "worldwide"
     allowed_domains = ["huawei.com"]
-    start_urls = ["http://consumer.huawei.com/en/support/downloads/index.htm"]
+    start_urls = ["http://consumer.huawei.com/en/"]
 
     def parse(self, response):
         yield Request(
