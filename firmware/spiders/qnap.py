@@ -49,7 +49,7 @@ class QNAPSpider(Spider):
         for _, fw_info in list(model_files.items()):
             href = fw_info['links']['global']  # options: {'global', 'europe', 'usa'}
             if not href.startswith("https://") and not href.startswith("http://"):
-                href = urllib.urljoin("https://", href)
+                href = urllib.parse.urljoin("https://", href)
 
             item = FirmwareLoader(
                     item=FirmwareImage(), response=response, date_fmt="%Y-%m-%d")

@@ -4,20 +4,19 @@ from scrapy.http import FormRequest
 from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
-import urllib.request, urllib.parse, urllib.error
-
 
 class MikrotikSpider(Spider):
     name = "mikrotik"
     allowed_domains = ["mikrotik.com"]
-    start_urls = ["https://www.mikrotik.com/download"]
+    start_urls = ["https://www.mikrotik.com/download/archive"]
 
     def parse(self, response):
-
         for href in response.xpath("//a/@href").extract():
-            if href.endswith(".npk") or href.endswith(".lzb"):
+            if 'dude' in href:
+                continue
+            elif href.endswith(".npk") or href.endswith(".lzb"):
                 if href.startswith("//"):
-                    href = "http:" + href
+                    href = "https:" + href
                 text = response.xpath("//text()").extract()
                 items = href.split('/')
                 version = items[-2]

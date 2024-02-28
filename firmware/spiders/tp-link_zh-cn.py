@@ -6,14 +6,14 @@ from scrapy.http import FormRequest
 from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 import json
 import re
 
 
 class TPLinkZHSpider(Spider):
     name = "tp-link_zh-cn"
-    vendor = "tp-link"
+    vendor = "tp-link_zh-cn"
     allowed_domains = ["tp-link.com.cn"]
     start_urls = [
         "http://service.tp-link.com.cn/list_download_software_1_0.html"]
@@ -83,8 +83,8 @@ class TPLinkZHSpider(Spider):
                     else:
                         self.logger.debug("No match for %s" %
                                           name)
-
-            item.add_value("url", product['fileName'])
+            print('http://service.tp-link.com.cn/download/' + quote(product['fileName']))
+            item.add_value("url", 'http://service.tp-link.com.cn/download/' + quote(product['fileName']))
             item.add_value("description", name)
             item.add_value("vendor", self.vendor)
             yield item.load_item()

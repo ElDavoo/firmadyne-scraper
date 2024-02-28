@@ -37,7 +37,7 @@ class SchneiderElectricSpider(Spider):
             href = link.xpath('@href').extract_first()
             if href.endswith('software-firmware-tab'):
                 logging.debug("Requesting SW+FW page for %s at %s",
-                        response.meta['product'], urllib.urljoin(response.url, href))
+                        response.meta['product'], urllib.parse.urljoin(response.url, href))
 
                 yield Request(
                     url=urllib.parse.urljoin(response.url, href),

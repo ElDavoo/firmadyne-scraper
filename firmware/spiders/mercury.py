@@ -28,7 +28,7 @@ class MercurySpider(Spider):
     def parse_list(self, response):
         href = response.xpath("//tbody//a//@href").extract()[0]
         yield Request(
-            url = urllib.urljoin(self.download_path, href),
+            url = urllib.parse.urljoin(self.download_path, href),
             headers={"Referer": response.url},
             callback = self.parse_product
             )
@@ -40,7 +40,7 @@ class MercurySpider(Spider):
             tmp.append(p)
 
         title = tmp[0].xpath("./p/text()").extract()[0]
-        url = urllib.urljoin(self.download_path, tmp[3].xpath("./a/@href").extract()[0])
+        url = urllib.parse.urljoin(self.download_path, tmp[3].xpath("./a/@href").extract()[0])
 
         def parse(title):
 

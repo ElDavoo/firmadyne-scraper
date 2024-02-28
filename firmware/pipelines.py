@@ -35,7 +35,7 @@ class FirmwarePipeline(FilesPipeline):
         extension = os.path.splitext(os.path.basename(
             urllib.parse.urlsplit(request.url).path))[1]
         return "%s/%s%s" % (request.meta["vendor"],
-                            hashlib.sha1(request.url.encode("utf8")).hexdigest(), extension)
+                            hashlib.sha1(request.url.encode('utf-8')).hexdigest(), extension)
 
     # overrides function from FilesPipeline
     def get_media_requests(self, item, info):
@@ -59,7 +59,10 @@ class FirmwarePipeline(FilesPipeline):
 
         # check for filtered url types in path
         url = urllib.parse.urlparse(item["url"])
-        if any(url.path.endswith(x) for x in [".pdf", ".php", ".txt", ".doc", ".rtf", ".docx", ".htm", ".html", ".md5", ".sha1", ".torrent"]):
+        # a special exception for the foscam html URL
+        if 'foscam.com' in str(url.netloc):
+            pass
+        elif any(url.path.endswith(x) for x in [".pdf", ".php", ".txt", ".doc", ".rtf", ".docx", ".htm", ".html", ".md5", ".sha1", ".torrent"]):
             raise DropItem("Filtered path extension: %s" % url.path)
         elif any(x in url.path for x in ["driver", "utility", "install", "wizard", "gpl", "login"]):
             raise DropItem("Filtered path type: %s" % url.path)

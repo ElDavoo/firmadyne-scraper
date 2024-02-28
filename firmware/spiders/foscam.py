@@ -4,35 +4,42 @@ from scrapy.http import Request
 from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
+import urllib.request, urllib.parse, urllib.error
+
+
 class FoscamSpider(Spider):
     name = "foscam"
     allowed_domains = ["foscam.com"]
     start_urls = [
-        "http://www.foscam.com/download-center/firmware-downloads.html"]
+        "http://www.foscam.com/downloads/firmware_details.html"]
 
     def start_requests(self):
         for url in self.start_urls:
             yield Request(url, cookies={'loginEmail': "@.com"}, dont_filter=True)
 
     def parse(self, response):
-        for i in range(0, len(response.xpath("//div[@id='main_right']/span[1]/p")), 7):
-            prods = response.xpath("//div[@id='main_right']/span[1]//p[%d]/text()" % (i + 2)).extract()[0].split("\r\n")
-
-            for product in [x for x in prods]:
-                item = FirmwareLoader(item=FirmwareImage(), response=response)
-                item.add_xpath("version", "//div[@id='main_right']/span[1]//p[%d]/text()" % (i + 3))
-                item.add_xpath("url", "//div[@id='main_right']/span[1]//p[%d]/a/@href" % (i + 7))
-                item.add_value("product", product)
-                item.add_value("vendor", self.name)
-                yield item.load_item()
-
-        for i in range(0, len(response.xpath("//div[@id='main_right']/span[2]/p")), 5):
-            prods = response.xpath("//div[@id='main_right']/span[2]//p[%d]/text()" % (i + 2)).extract()[0].split(",")
-
-            for product in [x for x in prods]:
-                item = FirmwareLoader(item=FirmwareImage(), response=response)
-                item.add_xpath("version", "//div[@id='main_right']/span[2]//p[%d]/text()" % (i + 3))
-                item.add_xpath("url", "//div[@id='main_right']/span[2]//p[%d]/a/@href" % (i + 5))
-                item.add_value("product", product)
-                item.add_value("vendor", self.name)
-                yield item.load_item()
+        # bit ugly but it works :-)
+        if "pid" not in response.meta:
+            for pid in range(0, 1000):
+                yield Request(
+                    url=urllib.parse.urljoin(response.url, "firmware_details.html?id=%s" % pid),
+                    meta={"pid": pid},
+                    headers={"Referer": response.url,
+                             "X-Requested-With": "XMLHttpRequest"},
+                    callback=self.parse)
+        else:
+            for product in response.xpath("//div[@class='download_list_icon']/span/text()").extract():
+                prods = response.xpath("//table[@class='down_table']//tr")
+                # print(prods)
+                # skip the table header
+                for p in [x for x in prods[1:]]:
+                    version = p.xpath('td[1]//text()').extract_first()
+                    # skip partial versions
+                    if '_p' in version:
+                        continue
+                    item = FirmwareLoader(item=FirmwareImage(), response=response)
+                    item.add_value("version", version)
+                    item.add_value("url", 'https://www.foscam.com' + p.xpath('td[6]//a/@href').extract_first())
+                    item.add_value("product", product)
+                    item.add_value("vendor", self.name)
+                    yield item.load_item()
