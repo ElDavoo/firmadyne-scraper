@@ -10,10 +10,10 @@ import urllib.request, urllib.parse, urllib.error
 class PhicommSpider(Spider):
     name = "phicomm"
     vendor = "phicomm"
-    allowed_domains = ["phicomm.com"]
+    allowed_domains = ["phicomm.de"]
     #Routers are K serials
-    start_urls = ["http://www.phicomm.com/cn/support.php/Soho/search_support/col/6,/keys/K.html"]
-    download_path = "http://www.phicomm.com/"
+    start_urls = ["http://www.phicomm.de/support/technischer-support.html"]
+    download_path = "http://www.phicomm.de"
 
     def parse(self, response):
         head = False

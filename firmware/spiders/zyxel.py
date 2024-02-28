@@ -15,12 +15,10 @@ class ZyXELSpider(Spider):
     custom_settings = {"CONCURRENT_REQUESTS": 3}
 
     def parse(self, response):
-        script = json.loads(response.xpath(
-            "//div[@id='searchDropUlWrap']/script//text()").extract()[0].split('=')[2].strip()[0: -1])
+        script = json.loads(response.xpath("//div[@id='searchDropUlWrap']/script//text()").extract()[0].split('=')[2].strip()[0: -1])
         for entry in script:
             yield Request(
-                url=urllib.parse.urljoin(
-                    response.url, "/us/en/support/SearchResultTab.shtml?c=us&l=en&t=dl&md=%s&mt=Firmware&mt=MIBFile" % script[entry][1]),
+                url=urllib.parse.urljoin(response.url, "/us/en/support/SearchResultTab.shtml?c=us&l=en&t=dl&md=%s&mt=Firmware&mt=MIBFile" % script[entry][1]),
                 headers={"Referer": response.url},
                 meta={"product": script[entry][1]},
                 callback=self.parse_product)

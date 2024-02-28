@@ -12,9 +12,9 @@ import urllib.request, urllib.parse, urllib.error
 class NetcoreSpider(Spider):
     name = "netcore"
     allowed_domains = ["netcoretec.com"]
-    start_urls = ["http://www.netcoretec.com/softwarelist/&downloadcategoryid=7&isMode=false&pageNo=1&pageSize=1000.html"]
-    product_url = 'http://www.netcoretec.com/software_detail/downloadsId={}.html'
-    firmware_url = "http://www.netcoretec.com/"
+    start_urls = ["http://www.netcoretec.com/service-support/download"]
+    product_url = 'http://www.netcoretec.com/service-support/download'
+    firmware_url = "http://www.netcoretec.com/service-support/download/firmware"
 
     def parse(self, response):
         th = False

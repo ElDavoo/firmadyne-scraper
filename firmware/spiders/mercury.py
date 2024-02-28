@@ -7,6 +7,8 @@ from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 import urllib.request, urllib.parse, urllib.error
 
+firmm=0
+
 class MercurySpider(Spider):
     name = "mercury"
     vendor = "mercury"
@@ -20,6 +22,7 @@ class MercurySpider(Spider):
         while cur_page < end_page:
             cur_page += 1
             url = 'http://service.mercurycom.com.cn/download-tip-software-{}-0-1.html'.format(cur_page)
+            print("parse "+str(firmm));
             yield Request(
                 url = url,
                 headers={"Referer": response.url},
@@ -27,8 +30,9 @@ class MercurySpider(Spider):
 
     def parse_list(self, response):
         href = response.xpath("//tbody//a//@href").extract()[0]
+        print("list "+str(firmm));
         yield Request(
-            url = urllib.parse.urljoin(self.download_path, href),
+            url = urllib.urljoin(self.download_path, href),
             headers={"Referer": response.url},
             callback = self.parse_product
             )
@@ -40,7 +44,7 @@ class MercurySpider(Spider):
             tmp.append(p)
 
         title = tmp[0].xpath("./p/text()").extract()[0]
-        url = urllib.parse.urljoin(self.download_path, tmp[3].xpath("./a/@href").extract()[0])
+        url = urllib.urljoin(self.download_path, tmp[3].xpath("./a/@href").extract()[0])
 
         def parse(title):
 
@@ -98,5 +102,6 @@ class MercurySpider(Spider):
         #item.add_value("version", version),
         item.add_value("vendor", self.vendor),
         item.add_value("description", title)
-            
+        print("new firm "+str(firmm))
+        firmm+=1
         yield item.load_item()

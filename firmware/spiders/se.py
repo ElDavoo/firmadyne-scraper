@@ -35,9 +35,9 @@ class SchneiderElectricSpider(Spider):
         meta['dont_redirect'] = True
         for link in response.css('a.tab-link'):
             href = link.xpath('@href').extract_first()
-            if href.endswith('software-firmware-tab'):
+            if href.endswith('software-and-firmware'):
                 logging.debug("Requesting SW+FW page for %s at %s",
-                        response.meta['product'], urllib.parse.urljoin(response.url, href))
+                        response.meta['product'], urllib.request.urljoin(response.url, href))
 
                 yield Request(
                     url=urllib.parse.urljoin(response.url, href),

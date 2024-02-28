@@ -10,11 +10,10 @@ import urllib.request, urllib.parse, urllib.error
 class PolycomSpider(Spider):
     name = "polycom"
     allowed_domains = ["polycom.com"]
-    start_urls = ["https://support.polycom.com/content/support/north-america/usa/en/support/video.html",
-                  "https://support.polycom.com/content/support/north-america/usa/en/support/network.html",
-                  "https://support.polycom.com/content/support/north-america/usa/en/support/voice.html",]
+    start_urls = ["https://poly.com/us/en/support/products/video-conferencing/accessories/index.html", "https://poly.com/us/en/support/products/network/index.html",
+                  "https://poly.com/us/en/support/products/cloud-hosted-solutions/index.html", "https://poly.com/us/en/support/products/strategic-partner-solutions/index.html"]
 
-    download = ""
+    download = "/PolycomService/support/us"
 
     @staticmethod
     def fix_url(url):
@@ -23,54 +22,52 @@ class PolycomSpider(Spider):
         return url
 
     def parse(self, response):
-        if "product" in response.meta:
-            for entry in response.xpath("//div[@class='tab-content']//tr")[1:]:
+        if response.xpath("//form[@name='UCagreement']"):
+            for href in response.xpath(
+                    "//div[@id='productAndDoc']").extract()[0].split('"'):
+                if "downloads.polycom.com" in href:
+                    item = FirmwareLoader(
+                        item=FirmwareImage(), response=response, date_fmt=["%B %d, %Y"])
+                    item.add_value("version", response.meta["version"])
+                    item.add_value("url", href.encode("utf-8"))
+                    item.add_value("date", response.meta["date"])
+                    item.add_value("description", response.meta["description"])
+                    item.add_value("product", response.meta["product"])
+                    item.add_value("vendor", self.name)
+                    yield item.load_item()
 
-                version = entry.xpath("./td[1]//a//text()").extract_first()
-                url = entry.xpath("./td[2]//a/@href").extract_first()
-                if version is None or url is None:
-                    continue
-
-                # remove unnecessary files
-                to_remove_list = ["end user license agreement", "eula", "release notes",
-                                                   "mac os", "windows", "guide", "(pdf)", "sample", "client",
-                                                   "manager", "software", "virtual", "control_panel",
-                                                   "activexbypass"]
-                if any(x in url.lower() for x in to_remove_list) \
-                        or any(x in version.lower() for x in to_remove_list) \
-                        or any(url.endswith(x) for x in ["htm", "html", "pdf", "ova", ".plcm.vc"]):
-                    continue
-
-                url = urllib.parse.urljoin(
-                            response.url, PolycomSpider.fix_url(url)),
-
-                item = FirmwareLoader(
-                    item=FirmwareImage(), response=response)
-                item.add_value("version", version)
-                item.add_value("url", url)
-                item.add_value("product", response.meta["product"])
-                item.add_value("vendor", self.name)
-                yield item.load_item()
-
-        # all entries on the product overview pages
-        elif response.xpath("//div[@class='product-listing']") and "product" not in response.meta:
-            for entry in response.xpath("//div[@class='product-listing']//li"):
+        elif response.xpath("//div[@id='ContentChannel']"):
+            for entry in response.xpath("//div[@id='ContentChannel']//li"):
                 if not entry.xpath("./a"):
                     continue
 
-                text = entry.xpath("./a//text()").extract_first()
-                href = entry.xpath("./a/@href").extract_first().strip()
-                # date = entry.xpath("./span//text()").extract()
+                text = entry.xpath("./a//text()").extract()[0]
+                href = entry.xpath("./a/@href").extract()[0].strip()
+                date = entry.xpath("./span//text()").extract()
 
-                if any(x in text.lower() for x in ["advisories", "support", "notices", "features"]) \
-                        or href.endswith(".pdf"):
+                path = urllib.urlparse(href).path
+
+                if any(x in text.lower() for x in ["end user license agreement", "eula", "release notes",
+                                                   "mac os", "windows", "guide", "(pdf)", "sample"]) or href.endswith(".pdf"):
                     continue
 
-                path = urllib.parse.urlparse(href).path
-                if any(path.endswith(x) for x in [".htm", ".html"]) or "(html)" in text.lower():
+                elif any(path.endswith(x) for x in [".htm", ".html"]) or "(html)" in text.lower():
                     yield Request(
                         url=urllib.parse.urljoin(
                             response.url, PolycomSpider.fix_url(href)),
-                        meta={"product": text},
+                        meta={"product": response.meta["product"] if "product" in response.meta else text,
+                              "date": date, "version": FirmwareLoader.find_version_period([text]), "description": text},
                         headers={"Referer": response.url},
                         callback=self.parse)
+
+                elif path:
+                    item = FirmwareLoader(
+                        item=FirmwareImage(), response=response, date_fmt=["%B %d, %Y"])
+                    item.add_value(
+                        "version", FirmwareLoader.find_version_period([text]))
+                    item.add_value("url", href.encode("utf-8"))
+                    item.add_value("date", item.find_date(date))
+                    item.add_value("description", text)
+                    # item.add_value("product", response.meta["product"])
+                    item.add_value("vendor", self.name)
+                    yield item.load_item()
