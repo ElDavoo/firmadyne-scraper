@@ -15,10 +15,10 @@ class NetgearSpider(Spider):
     # "http://downloadcenter.netgear.com/fr/", "http://downloadcenter.netgear.com/de/", "http://downloadcenter.netgear.com/it/", "http://downloadcenter.netgear.com/ru/", "http://downloadcenter.netgear.com/other/"]
     
     start_urls = ["http://downloadcenter.netgear.com"]
-    links_json=json.loads(urlopen('https://www.netgear.com/system/supportModels.json').read());
-    for lnk in links_json:
-        print('http://netgear.com/support/download/?model='+lnk['model'])
-        start_urls.append('http://netgear.com/support/download/?model='+lnk['model'])
+    #links_json=json.loads(urlopen('https://www.netgear.com/system/supportModels.json').read());
+    #for lnk in links_json:
+    #    print('http://netgear.com/support/download/?model='+lnk['model'])
+    #    start_urls.append('http://netgear.com/support/download/?model='+lnk['model'])
     
     visited = []
 

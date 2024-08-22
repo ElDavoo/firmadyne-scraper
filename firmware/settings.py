@@ -23,6 +23,6 @@ DOWNLOAD_MAXSIZE = 0
 DOWNLOAD_WARNSIZE = 0
 
 ROBOTSTXT_OBEY = False
-USER_AGENT = "FirmwareBot/1.0 (+https://github.com/firmadyne/scraper)"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
-#SQL_SERVER = "127.0.0.1"
+#API_URL = "http://localhost:5000/"
