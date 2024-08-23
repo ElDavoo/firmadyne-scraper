@@ -6,7 +6,7 @@ from firmware.loader import FirmwareLoader
 
 import json
 import urllib.request, urllib.parse, urllib.error
-
+import logging
 
 class DLinkSpider(Spider):
     name = "dlink"
@@ -32,15 +32,19 @@ class DLinkSpider(Spider):
         for entry in response.xpath("//select[@id='ddlHardWare']/option"):
             rev = entry.xpath(".//text()").extract()[0]
             val = entry.xpath("./@value").extract()[0]
+            dsp = response.xpath("//p[@class='Pimgbig']/span[2]/text()").extract()[0].strip()
 
             if val:
+                #tmp=urllib.parse.urljoin(
+                #        response.url, "/ajax/ajax.ashx?action=productfile&ver=%s" % val)
+                #logging.debug(tmp)
                 yield Request(
                     url=urllib.parse.urljoin(
                         response.url, "/ajax/ajax.ashx?action=productfile&ver=%s" % val),
                     headers={"Referer": response.url,
                              "X-Requested-With": "XMLHttpRequest"},
                     meta={"product": response.meta[
-                        "product"], "revision": rev},
+                        "product"], "revision": rev, "description": dsp},
                     callback=self.parse_json)
 
     def parse_json(self, response):
@@ -62,6 +66,7 @@ class DLinkSpider(Spider):
                     item.add_value("build", response.meta["revision"])
                     item.add_value("product", response.meta["product"])
                     item.add_value("vendor", self.name)
+                    item.add_value("device_class", response.meta["description"])
                     item.add_value("mib", mib)
                     yield item.load_item()
                 elif "MIB" in file["name"]:

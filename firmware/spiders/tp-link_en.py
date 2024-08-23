@@ -60,7 +60,7 @@ class TPLinkENSpider(Spider):
             item.add_value("device_class", response.meta["category"])
             item.add_value("version", version)
             yield item.load_item()
-
+        '''
         gpl_source_codes=response.css("#content_GPL-Code a")
         self.logger.debug("%s %s: %d gpl source code found." % (response.meta["product"], version, len(gpl_source_codes)))
         for gpl in gpl_source_codes:

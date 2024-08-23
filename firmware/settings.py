@@ -1,15 +1,21 @@
 BOT_NAME = "firmware"
 
 SPIDER_MODULES = ["firmware.spiders"]
-NEWSPIDER_MODULE = "scraper.spiders"
+NEWSPIDER_MODULE = "firmware.spiders"
 
+# https://docs.scrapy.org/en/latest/topics/settings.html#download-handlers
 DOWNLOAD_HANDLERS = {
+    # disables the s3 handler
     's3': None,
 }
 
+# https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "firmware.pipelines.FirmwarePipeline" : 1,
 }
+
+# https://docs.scrapy.org/en/latest/topics/request-response.html#request-fingerprinter-implementation
+REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 
 FILES_STORE = "./output/"
 

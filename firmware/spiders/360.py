@@ -11,8 +11,8 @@ import json
 class A360Spider(Spider):
     name = "360"
     #allowed_domains = ["luyou.360.cn"]
-    json_url = "http://s7.qhres.com/static/ef5bacdd3d93fa90/common_info.js"
-    #start_urls = ["http://luyou.360.cn/download_center.html?from=nav"]
+    start_urls = ["http://luyou.360.cn/download_center.html?from=nav"]
+    json_url = "https://s7.qhimg.com/static/ef5bacdd3d93fa90/common_info.js"
 
     def parse(self, response):
         yield Request(
