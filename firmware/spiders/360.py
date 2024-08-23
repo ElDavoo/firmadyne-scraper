@@ -12,7 +12,7 @@ class A360Spider(Spider):
     name = "360"
     #allowed_domains = ["luyou.360.cn"]
     json_url = "http://s7.qhres.com/static/ef5bacdd3d93fa90/common_info.js"
-    start_urls = ["http://luyou.360.cn/download_center.html?from=nav"]
+    #start_urls = ["http://luyou.360.cn/download_center.html?from=nav"]
 
     def parse(self, response):
         yield Request(
@@ -23,8 +23,6 @@ class A360Spider(Spider):
     def parse_product(self, response):
         js = response.text
         if js.startswith("var commonInfo"):
-            print((response.url))
-            print(js)
 
             p_product = "id:\"(?P<product>.*?)\""
             p_description = "title:\"(?P<description>.*?)\""

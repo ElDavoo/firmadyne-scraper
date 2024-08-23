@@ -57,7 +57,7 @@ class TPLinkENSpider(Spider):
             item.add_value("size", spans[5].css("::text").get().strip())
             item.add_value("description", "\n".join(firmware.css('td.more p').getall()))
             item.add_value("product", response.meta["product"])
-            item.add_value("category", response.meta["category"])
+            item.add_value("device_class", response.meta["category"])
             item.add_value("version", version)
             yield item.load_item()
 
@@ -65,10 +65,11 @@ class TPLinkENSpider(Spider):
         self.logger.debug("%s %s: %d gpl source code found." % (response.meta["product"], version, len(gpl_source_codes)))
         for gpl in gpl_source_codes:
             item = FirmwareLoader(
-            item=FirmwareImage(), response=response, date_fmt=["%d/%m/%Y"])
+            item=FirmwareImage(), response=response, date_fmt=["%d/%m/%y"])
             item.add_value("vendor", self.vendor)
             item.add_value("url", gpl.css("a::attr(href)").get())
             item.add_value("product", response.meta["product"])
             item.add_value("category", response.meta["category"])
             item.add_value("version", version)
             yield item.load_item()
+        '''

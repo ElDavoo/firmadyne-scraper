@@ -1,5 +1,5 @@
 from scrapy.loader import ItemLoader
-from itemloaders.processors import Identity, MapCompose, TakeFirst
+from scrapy.loader.processors import Identity, MapCompose, TakeFirst
 
 import datetime
 import re
@@ -35,8 +35,8 @@ class FirmwareLoader(ItemLoader):
 
     def find_date(self, text):
         for fmt in self.context.get("date_fmt", []):
-            fmt = "(" + re.escape(fmt).replace("%b", "[a-zA-Z]{3}").replace("%B", "[a-zA-Z]+").replace(
-                 "%m", "\d{1,2}").replace("%d", "\d{1,2}").replace("%y", "\d{2}").replace("%Y", "\d{4}") + ")"
+            fmt = "(" + re.escape(fmt).replace("\%b", "[a-zA-Z]{3}").replace("\%B", "[a-zA-Z]+").replace(
+                "\%m", "\d{1,2}").replace("\%d", "\d{1,2}").replace("\%y", "\d{2}").replace("\%Y", "\d{4}") + ")"
             match = re.search(fmt, "".join(text).strip())
             res = [x for x in match.groups() if x] if match else None
 
@@ -71,8 +71,8 @@ class FirmwareLoader(ItemLoader):
     description_in = MapCompose(remove_html, clean)
     version_in = MapCompose(clean)
     build_in = MapCompose(clean)
-    date_in = MapCompose(clean, parse_date)
+    date_in = MapCompose(clean)
 
     mib_in = MapCompose(fix_url)
     sdk_in = MapCompose(fix_url)
-    url_in = MapCompose(fix_url)
+    url_in = MapCompose(clean)

@@ -4,9 +4,10 @@ from scrapy.pipelines.files import FilesPipeline
 
 import os
 import hashlib
-import logging
 import urllib.parse
 import urllib.request, urllib.parse, urllib.error
+import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class FirmwarePipeline(FilesPipeline):
         extension = os.path.splitext(os.path.basename(
             urllib.parse.urlsplit(request.url).path))[1]
         return "%s/%s%s" % (request.meta["vendor"],
-                            hashlib.sha1(request.url.encode('utf-8')).hexdigest(), extension)
+                            hashlib.sha1(request.url.encode("utf8")).hexdigest(), extension)
 
     # overrides function from FilesPipeline
     def get_media_requests(self, item, info):
@@ -70,6 +71,12 @@ class FirmwarePipeline(FilesPipeline):
         # generate list of url's to download
         item[self.files_urls_field] = [item[x]
                                        for x in ["mib", "url"] if x in item]
+        
+        # debug the download link
+        ##############################
+        #for link in item[self.files_urls_field]:
+        #    logging.debug(link)
+
 
         # pass vendor so we can generate the correct file path and name
         return [Request(x, meta={"ftp_user": "anonymous", "ftp_password": "chrome@example.com", "vendor": item["vendor"]}) for x in item[self.files_urls_field]]

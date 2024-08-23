@@ -12,7 +12,7 @@ class FirmwareImage(Item):
     date = Field(default=None)
     size = Field(default=None)
     language = Field(default=None)
-    
+    device_class = Field(default=None)
     mib = Field(default=None)
     sdk = Field(default=None)
     url = Field()
