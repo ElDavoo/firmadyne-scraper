@@ -13,15 +13,29 @@ logger = logging.getLogger(__name__)
 
 class FirmwarePipeline(FilesPipeline):
     def __init__(self, store_uri, download_func=None, settings=None):
-        if settings and "SQL_SERVER" in settings:
+        self.database = None
+        def chk(settings, s: str):
+            if not settings or s not in settings or settings[s] == "":
+                return False
+            return True 
+        if not chk(settings, "SQL_HOST"):
+            super(FirmwarePipeline, self).__init__(store_uri, download_func,settings)
+            return
+        try:        
             import psycopg2
-            self.database = psycopg2.connect(database="firmware", user="firmadyne",
-                                             password="firmadyne", host=settings["SQL_SERVER"],
-                                             port=5432)
-        else:
-            self.database = None
-
-        super(FirmwarePipeline, self).__init__(store_uri, download_func,settings)
+            self.database = psycopg2.connect(
+                database=settings["SQL_DATABASE"] if chk(settings, "SQL_DATABASE") is not None else "firmadyne",
+                user=settings["SQL_USER"] if chk(settings, "SQL_USER") is not None else "firmadyne",
+                password=settings["SQL_PASSWORD"] if chk(settings, "SQL_PASSWORD") is not None else "firmadyne",
+                host=settings["SQL_HOST"],
+                port=settings["SQL_PORT"] if chk(settings,"SQL_PORT") is not None else 5432,
+                )
+        except ImportError:
+            print("psycopg2 not found, saving to DB disabled")
+        except psycopg2.Error as e:
+            print(f"error while connecting to DB: {e}")
+        finally:
+            super(FirmwarePipeline, self).__init__(store_uri, download_func,settings)
     @classmethod
     def from_settings(cls, settings):
         store_uri = settings['FILES_STORE']
