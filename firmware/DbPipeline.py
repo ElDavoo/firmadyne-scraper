@@ -11,15 +11,16 @@ import re
 
 logger = logging.getLogger(__name__)
 
-class FirmwarePipeline(FilesPipeline):
+class DbPipeline(FilesPipeline):
     def __init__(self, store_uri, download_func=None, settings=None):
         self.database = None
+        self.store_uri = settings["FILES_STORE"]
         def chk(settings, s: str):
             if not settings or s not in settings or settings[s] == "":
                 return False
             return True 
         if not chk(settings, "SQL_HOST"):
-            super(FirmwarePipeline, self).__init__(store_uri, download_func,settings)
+            super(DbPipeline, self).__init__(store_uri, download_func,settings)
             return
         try:        
             import psycopg2
@@ -35,7 +36,7 @@ class FirmwarePipeline(FilesPipeline):
         except psycopg2.Error as e:
             print(f"error while connecting to DB: {e}")
         finally:
-            super(FirmwarePipeline, self).__init__(store_uri, download_func,settings)
+            super(DbPipeline, self).__init__(store_uri, download_func,settings)
     @classmethod
     def from_settings(cls, settings):
         store_uri = settings['FILES_STORE']

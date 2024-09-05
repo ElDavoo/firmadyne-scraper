@@ -11,7 +11,8 @@ DOWNLOAD_HANDLERS = {
 
 # https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "firmware.pipelines.FirmwarePipeline" : 1,
+    #"firmware.DbPipeline.DbPipeline" : 1,
+    "firmware.FactPipeline.FactPipeline": 1,
 }
 
 # https://docs.scrapy.org/en/latest/topics/request-response.html#request-fingerprinter-implementation
@@ -36,3 +37,6 @@ SQL_PORT = 5433
 SQL_DATABASE = "thesis"
 SQL_USER = "thesis"
 SQL_PASSWORD = "thesis"
+
+FACT_URL = ""
+FACT_API_KEY = ""
