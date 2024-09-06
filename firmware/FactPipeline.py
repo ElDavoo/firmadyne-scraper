@@ -106,7 +106,9 @@ class FactPipeline:
             else:
                 print("download unsuccesful {resp}")
         
-        if len(responses) == 1:
+        file_name = item["url"].split('/')[-1]
+
+        if len(responses) != 1:
             binary = responses[0].body
         else:
             print("multiple files detected")
@@ -118,6 +120,7 @@ class FactPipeline:
                 tarinfo.size = len(response.body)
                 tar.addfile(tarinfo, io.BytesIO(response.body))
             binary = fileobj.getvalue()
+            file_name += ".tar"
 
         
         fact_uid = FactPipeline.calc_fact_uid(binary)

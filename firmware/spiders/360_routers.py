@@ -5,22 +5,12 @@ from scrapy.http import Request
 from firmware.items import FirmwareImage
 from firmware.loader import FirmwareLoader
 
-import urllib.request, urllib.parse, urllib.error
-import json
-
 class A360Spider(Spider):
-    name = "360"
-    #allowed_domains = ["luyou.360.cn"]
-    start_urls = ["http://luyou.360.cn/download_center.html?from=nav"]
-    json_url = "https://s7.qhimg.com/static/ef5bacdd3d93fa90/common_info.js"
+    name = "360Routers"
+    allowed_domains = ["luyou.360.cn", "luyou.dl.qihucdn.com"]
+    start_urls = ["http://luyou.360.cn/resource/js/common_info.js"]
 
     def parse(self, response):
-        yield Request(
-            url=self.json_url,
-            headers={"Referer": response.url},
-            callback=self.parse_product)
-
-    def parse_product(self, response):
         js = response.text
         if js.startswith("var commonInfo"):
 
@@ -52,4 +42,5 @@ class A360Spider(Spider):
                 item.add_value("description", description)
                 item.add_value("date", date)
                 item.add_value("vendor", self.name)
+                item.add_value("device_class", "router")
                 yield item.load_item()
