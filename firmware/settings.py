@@ -39,3 +39,13 @@ SQL_USER = "thesis"
 SQL_PASSWORD = "thesis"
 
 FACT_URL = "http://127.0.0.1:5000/rest/"
+
+from shutil import which
+
+SELENIUM_DRIVER_NAME = 'firefox'
+SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
+SELENIUM_DRIVER_ARGUMENTS=['-headless'] 
+
+DOWNLOADER_MIDDLEWARES = {
+    'firmware.selenium.middlewares.SeleniumMiddleware': 800
+}
