@@ -20,3 +20,4 @@ class FirmwareImage(Item):
     # used by FilesPipeline
     files = Field()
     file_urls = Field()
+    file_name = Field()

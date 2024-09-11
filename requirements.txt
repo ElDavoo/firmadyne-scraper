@@ -4,3 +4,7 @@ psycopg2~=2.9.9
 requests~=2.32.3
 requests-toolbelt~=1.0.0
 BeautifulSoup4~=4.10.0
+selenium-wire~=5.1.0
+#https://www.marekrost.cz/selenium-wire-how-to-resolve-blinker-saferef
+blinker<1.8
+retry-requests~=2.0.0

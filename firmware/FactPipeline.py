@@ -11,6 +11,7 @@ import base64
 import io
 import json
 import tarfile
+from retry_requests import retry
 logger = logging.getLogger(__name__)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -29,7 +30,8 @@ class FactPipeline:
         self.plugins = list(json.loads(self.session.get("status").text)['plugins'].keys())
         # Remove time consuming plugins
         try:
-            self.plugins = [ p for p in self.plugins if p not in ["cwe_checker", "cwe_checker78", "ipc_analyzer"]]
+            self.plugins = [ p for p in self.plugins if p not in ["cwe_checker", "cwe_checker78", "ipc_analyzer"
+                                                                  ,"file_system_metadata"]]
         except ValueError:
             pass
 
@@ -93,23 +95,22 @@ class FactPipeline:
 
 
     # overrides function from FilesPipeline
-    async def process_item(self, item, spider):
+    def process_item(self, item, spider):
         adapter = ItemAdapter(item)
         files = self.get_media_requests(item)
         responses = []
         for f in files:
-            resp = await maybe_deferred_to_future(
-            spider.crawler.engine.download(f)
-            )
-            if 200 <= resp.status <= 299:
+            resp = retry().get(f.url)
+                
+            if resp.ok:
                 responses.append(resp)
             else:
                 print("download unsuccesful {resp}")
         
-        file_name = item["url"].split('/')[-1]
+        file_name = item.get("file_name", item["url"].split('/')[-1])
 
-        if len(responses) != 1:
-            binary = responses[0].body
+        if len(responses) == 1:
+            binary = responses[0].content
         else:
             print("multiple files detected")
             # make tar with all files inmemory
@@ -131,7 +132,7 @@ class FactPipeline:
                 'device_class': item.get('device_class', 'camera'),
                 'device_name': item.get("product", None),
                 'device_part': "complete",
-                'file_name': item["url"].split('/')[-1],
+                'file_name': file_name,
                 'release_date': item.get("date", None),
                 'requested_analysis_systems': self.plugins,
                 'tags': 'scraper',
@@ -139,6 +140,6 @@ class FactPipeline:
                 'version': item.get("version", item.get("build", None))
             }
             response = self.session.put("firmware", json=params)
-            logger.info(f"Uploaded {item["url"].split('/')[-1]} to FACT")
+            logger.info(f"Uploaded {file_name} to FACT")
 
         return item

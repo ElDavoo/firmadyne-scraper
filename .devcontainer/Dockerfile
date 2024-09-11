@@ -39,3 +39,4 @@ RUN rm -rf /var/lib/apt/lists/* \
 # enable it, regardless whether WebDriver client requests it in capabilities or
 # not.
 ENV MOZ_HEADLESS=1
+ENV PATH=$PATH:/opt/firefox

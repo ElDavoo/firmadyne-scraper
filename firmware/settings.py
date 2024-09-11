@@ -1,3 +1,5 @@
+from seleniumwire import webdriver
+
 BOT_NAME = "firmware"
 
 SPIDER_MODULES = ["firmware.spiders"]
@@ -45,6 +47,39 @@ from shutil import which
 SELENIUM_DRIVER_NAME = 'firefox'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
 SELENIUM_DRIVER_ARGUMENTS=['-headless'] 
+
+SELENIUM_DRIVER_PROFILE = webdriver.FirefoxProfile()
+SELENIUM_DRIVER_PREFERENCES = {
+'permissions.default.stylesheet': 2,
+'permissions.default.image': 2,
+'dom.ipc.plugins.enabled.libflashplayer.so': 'false',
+'browser.download.folderList': 2,
+'browser.download.manager.showWhenStarting': False,
+'browser.download.dir': '/dev/null',
+'pdfjs.disabled': True,
+'plugin.scan.plid.all': False,
+'app.update.auto': False,
+'app.update.enabled': False,
+'extensions.blocklist.enabled' : False,
+'browser.search.update': False,
+'extensions.update.enabled': False,
+'browser.shell.checkDefaultBrowser': False,
+'browser.safebrowsing.downloads.remote.enabled': False,
+'messaging-system.rsexperimentloader.enabled': False,
+'app.shield.optoutstudies.enabled': False,
+'app.normandy.enabled': False,
+'browser.search.geoip.url': '',
+'browser.startup.homepage_override.mstone': 'ignore',
+'extensions.getAddons.cache.enabled': False,
+'media.gmp-widevinecdm.enabled': False,
+'media.gmp-gmpopenh264.enabled': False,
+'network.captive-portal-service.enabled': False,
+'network.connectivity-service.enabled': False,
+'privacy.trackingprotection.enabled': False,
+'privacy.trackingprotection.socialtracking.enabled': False,
+}
+
+
 
 DOWNLOADER_MIDDLEWARES = {
     'firmware.selenium.middlewares.SeleniumMiddleware': 800
