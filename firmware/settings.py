@@ -47,6 +47,7 @@ from shutil import which
 SELENIUM_DRIVER_NAME = 'firefox'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
 SELENIUM_DRIVER_ARGUMENTS=['-headless'] 
+#SELENIUM_DRIVER_ARGUMENTS=[] 
 
 SELENIUM_DRIVER_PROFILE = webdriver.FirefoxProfile()
 SELENIUM_DRIVER_PREFERENCES = {
@@ -82,5 +83,8 @@ SELENIUM_DRIVER_PREFERENCES = {
 
 
 DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
     'firmware.selenium.middlewares.SeleniumMiddleware': 800
 }
+DOWNLOAD_DELAY = 10
+CONCURRENT_REQUESTS_PER_DOMAIN = 1

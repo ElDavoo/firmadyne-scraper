@@ -137,9 +137,12 @@ class FactPipeline:
                 'requested_analysis_systems': self.plugins,
                 'tags': 'scraper',
                 'vendor': item['vendor'],
-                'version': item.get("version", item.get("build", None))
+                'version': item.get("version", item.get("build", "v1"))
             }
             response = self.session.put("firmware", json=params)
-            logger.info(f"Uploaded {file_name} to FACT")
+            if response.ok:
+                logger.info("Successfully uploaded %s", item["url"])
+            else:
+                logger.error("Failed to upload %s because %s", item["url"], response.text[:100])
 
         return item

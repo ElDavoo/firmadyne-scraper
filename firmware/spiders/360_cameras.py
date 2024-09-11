@@ -61,7 +61,7 @@ class A360Spider(Spider):
     def parse_123pan(self, response):
         driver = response.meta['driver']
         del driver.requests
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(20)
         # Find the tbody ant-table-tbody
         tbody = driver.find_element(By.CLASS_NAME, "ant-table-tbody")
         # Find the not hidden rows (the ones that do not have aria-hidden)
