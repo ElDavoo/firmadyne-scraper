@@ -11,7 +11,9 @@ import base64
 import io
 import json
 import tarfile
-from retry_requests import retry
+
+from retry_requests import retry as retryrequests
+from retry import retry
 logger = logging.getLogger(__name__)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -30,7 +32,8 @@ class FactPipeline:
         self.plugins = list(json.loads(self.session.get("status").text)['plugins'].keys())
         # Remove time consuming plugins
         try:
-            self.plugins = [ p for p in self.plugins if p not in ["cwe_checker", "cwe_checker78", "ipc_analyzer"
+            self.plugins = [ p for p in self.plugins if p not in 
+                            ["cwe_checker", "cwe_checker78", "ipc_analyzer", "tlsh"
                                                                   ,"file_system_metadata"]]
         except ValueError:
             pass
@@ -93,6 +96,10 @@ class FactPipeline:
         length = len(file)
         return f"{chksum}_{length}"
 
+    @retry(tries=3, delay=1, backoff=2)
+    @staticmethod
+    def get(url):
+        return retryrequests().get(url)
 
     # overrides function from FilesPipeline
     def process_item(self, item, spider):
@@ -100,7 +107,7 @@ class FactPipeline:
         files = self.get_media_requests(item)
         responses = []
         for f in files:
-            resp = retry().get(f.url)
+            resp = FactPipeline.get(f.url)
                 
             if resp.ok:
                 responses.append(resp)
@@ -144,5 +151,7 @@ class FactPipeline:
                 logger.info("Successfully uploaded %s", item["url"])
             else:
                 logger.error("Failed to upload %s because %s", item["url"], response.text[:100])
+        else:
+            logger.info("%s was already in FACT", item["url"])
 
         return item

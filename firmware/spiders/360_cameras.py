@@ -5,9 +5,12 @@ from firmware.selenium import SeleniumRequest
 from selenium.webdriver.common.by import By
 
 from firmware.items import FirmwareImage
+from humanfriendly import parse_size
 from firmware.loader import FirmwareLoader
 from time import sleep
-
+import dateutil.parser as dateparser
+from selenium.common.exceptions import TimeoutException
+from scrapy.downloadermiddlewares.retry import get_retry_request
 # import webdriverwait
 from selenium.webdriver.support.ui import WebDriverWait
 import json
@@ -22,10 +25,6 @@ class A360Spider(Spider):
     name = "360Cameras"
     scopes = ['.*cjjd19.com']
 
-    @staticmethod
-    def interceptor(request):
-        request.abort()
-
     def start_requests(self):
         yield Request(
             url="https://bbs.360.cn/thread-15799665-1-1.html",
@@ -38,9 +37,11 @@ class A360Spider(Spider):
         table = td.xpath('.//table')
         # Find the rows
         rows = table.xpath('.//tr')
-        requests = []
+        # Scheduling defect workaround (we don't want to open 16 ff drivers at once)
+        # Nothing I tried works, so we just "manually" launch one single driver
+        self.selrequests = []
         # Skip the first row
-        for row in rows[1:3]:
+        for row in rows[1:]:
             # Find the columns
             cols = row.xpath('.//td')
             if len(cols) < 3:
@@ -50,14 +51,20 @@ class A360Spider(Spider):
             model = cols[1].xpath('.//text()').get()
             url = cols[2].xpath('.//a/@href').get()
 
-            requests.append(SeleniumRequest(url=url, callback=self.parse_123pan,
+            self.selrequests.append(SeleniumRequest(url=url, callback=self.parse_123pan,
                       meta={
                           "model": model,
                       },
                       capture_scopes=['.*cjjd19.com'],
                       priority=100,))
-        return requests
-        
+        yield self.get_next_request()
+        #TODO There are other links after the table, we should get them too
+    
+    def get_next_request(self):
+        if len(self.selrequests) > 0:
+            return self.selrequests.pop(0)
+        return None
+
     def parse_123pan(self, response):
         driver = response.meta['driver']
         del driver.requests
@@ -76,8 +83,18 @@ class A360Spider(Spider):
             file_name = cols[1].text
             # Extract the date
             date = cols[3].text
+            date = dateparser.parse(date)
+            date = date.isoformat()
+            size = cols[4].text
+            size = parse_size(size)
+            if size > 100 * 1024 * 1024:
+                self.logger.warning("File is too big, 123pan requires an account: %s", size)
+                driver.quit()
+                yield self.get_next_request()
+                return
         except Exception as e:
-            self.logger.error("Error extracting date: %s", e)
+            self.logger.error("Error parsing date: %s", e)
+            date = None
 
         # Find the series of three buttons in the right
         rightInfo = driver.find_element(By.CLASS_NAME, "rightInfo")
@@ -88,16 +105,23 @@ class A360Spider(Spider):
         btn.click()
         # Wait 10 seconds for request to be made. If doesn't happen, click again
         try:
-            WebDriverWait(driver, 10).until(lambda driver: len(driver.requests) > 0)
-        except TimeoutError:
-            btn.click()
-            WebDriverWait(driver, 10).until(lambda driver: len(driver.requests) > 0)
+            WebDriverWait(driver, 20).until(lambda driver: len(driver.requests) > 0)
+        except Exception:
+            request_or_none = get_retry_request(response.request,
+                                    spider=self,
+                                    reason="Download not started")
+            driver.quit()
+            if request_or_none:
+                yield request_or_none
+            else:
+                yield self.get_next_request()
+            return
 
-        print("yielding request")
+        logging.info("Got the download link")
 
         yield Request(url=driver.last_request.url, callback=self.parse_redirectjson, meta={
             "driver": driver,
-            "date": cols[3].text,
+            "date": date,
             "model": response.meta['model'],
             "file_name": file_name
             }, priority=-1)
@@ -129,3 +153,4 @@ class A360Spider(Spider):
         item.add_value("date", response.meta['date'])
         item.add_value("file_name", response.meta['file_name'])
         yield item.load_item()
+        yield self.get_next_request()
